@@ -10,6 +10,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Hypothesis Testing 
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
 
 ### 1- W&S, Ch 6, Question 15,21, and 29
 
@@ -27,5 +33,47 @@ For the following alternative hypotheses, give the appropriate null hypothesis:
 15e. Null: Male white-collared manakins dance as frequently when females are present as they do when females are absent.  
 
 ####1.2 Question 21
+Two researchers testing the same null hypothesis, all equal example n1=60 and n2=100  
+
+21a. The study with the higher probability of Type II error is the one with 60 participants because the study with 100 has a higher power, and increased power decreases the chances of a type II error.
+
+21b. The study with the higher power is the one with 100 participants since all else is equal in the study- power increases with sample size 
+
+21c. Type I errors are regulated by the choice of alpha, which is the same for both studies, so they are both as likely to commit a type I error....
+
+21d. The test should be two-tailed because the null hypothesis is that the inhibitors have no effect on cardiac arrest, which means the alternative hypothesis is that they have an effect which could either be in either direction- reducing or increasing the risk of cardiac arrest.   
+
+####1.3 Question 29
+100 independent hypothesis tests with an alpha of 0.05. Use R to calc P value.
+
+29a. If all null hypothesis were true, what is the probability that the researchers would reject none of them?
+
+29b. If all 100 null hypothesis were true, how many of those tests on average are expected to reject the null? 
+
+### Question 2- ch 7, Q22
+
+9821 slices of toast dropped, 6101 landed butter side down
+
+a. What is the 95% CI for the probability of a toast landing butter side down?
+
+b. Using the results of part a, is it plausible there is a 50-50 chance of toast landing butter size up or butter size down?  
 
 
+###3 From the Lab: Many SDs and Alphas
+Assume average population-wide resting heart rate of 80 bpm with a standard deviation of 6, effect size of 5  
+#### Goal: what sample size do we need to achieve a power of 0.8? 
+
+#### 3.1 Start up your simulation
+Make a simulated data frame to look at the effects of multiple sample sizes: from 1-20, with 500 simulations per sample size, and also multiple SD values, from 3 through 10 (just 3:10, no need for non-integer values). You’re going to want crossing with your intitial data frame of just sample sizes and a vector of sd values to start. Then generate samples from the appropriate random normal distribution.
+
+```{r}
+Sim_data <- data.frame(samp_size = rep(1:20, 500))
+SD_val <- c(3:10)
+
+Sim_data <- Sim_data %>% 
+  
+ group_by(1:n()) %>%   #n= allows us to change the 500, and not need to change 
+  #get a sample mean
+  mutate(sample_mean= mean(rnorm(samp_size, 85, SD_val))) %>%
+  ungroup()
+```
