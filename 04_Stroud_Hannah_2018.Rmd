@@ -1,0 +1,31 @@
+---
+title: "04_Stroud_Hannah_2018"
+author: "Hannah Stroud"
+date: "October 1, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Hypothesis Testing 
+
+### 1- W&S, Ch 6, Question 15,21, and 29
+
+####1.1 Question 15 
+For the following alternative hypotheses, give the appropriate null hypothesis:  
+
+15a. The null hypothesis would be: There are no differences in mean femur length between pygmy mammoths and continental mammoths.  
+
+15b. Null: Patients who take phentermine and topiramate lose wait at the same rate as control patients that do not take these drugs.  
+
+15c. Null:  Patients who take phentermine and topiramate have the same proportion of their babies born with cleft palates as patients who do not take these drugs.  
+
+15d. Null: On average shoppers do not buy different amounts of candy when Christmas music is playing in the shop compared to when the usual type of music is playing.  
+
+15e. Null: Male white-collared manakins dance as frequently when females are present as they do when females are absent.  
+
+####1.2 Question 21
+
+
