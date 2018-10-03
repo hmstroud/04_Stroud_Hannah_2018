@@ -64,12 +64,15 @@ Assume average population-wide resting heart rate of 80 bpm with a standard devi
 #### Goal: what sample size do we need to achieve a power of 0.8? 
 
 #### 3.1 Start up your simulation
-Make a simulated data frame to look at the effects of multiple sample sizes: from 1-20, with 500 simulations per sample size, and also multiple SD values, from 3 through 10 (just 3:10, no need for non-integer values). You’re going to want crossing with your intitial data frame of just sample sizes and a vector of sd values to start. Then generate samples from the appropriate random normal distribution.
+Multiple sample sizes: from 1-20, with 500 simulations per sample size  
+multiple SD values, from 3 through 10 (just 3:10, no need for non-integer values)  
+You’re going to want crossing with your intitial data frame of just sample sizes and a vector of sd values to start. Then generate samples from the appropriate random normal distribution.
 
 ```{r}
 Sim_data <- data.frame(samp_size = rep(1:20, 500))
 SD_val <- c(3:10)
-
+Sim_data <- crossing(Sim_data
+         , SD_val)
 Sim_data <- Sim_data %>% 
   
  group_by(1:n()) %>%   #n= allows us to change the 500, and not need to change 
@@ -77,3 +80,27 @@ Sim_data <- Sim_data %>%
   mutate(sample_mean= mean(rnorm(samp_size, 85, SD_val))) %>%
   ungroup()
 ```
+
+#### 3.2 Z Test
+now that you've done that, calculate the results from z-tests. Plot p by sample size, using `facet_wrap` for different SD values  
+
+```{r}
+Sim_data <- Sim_data %>% #overwrite 
+ mutate(sigma_ybar= SD_val/(sqrt(samp_size))) %>%  #Sigma_y bar formula from slides
+  mutate(Z_score= (sample_mean- 80)/sigma_ybar) %>%
+  mutate(p_val= pnorm(abs(Z_score), lower.tail = FALSE))
+
+Sim_plot <- ggplot(data= Sim_data, 
+                   mapping = aes(x= samp_size, y= p_val ))+ 
+  geom_point() +
+  facet_wrap(SD_val)
+Sim_plot
+
+```
+# Sample of 10 flies
+# Sample mean of antenna length= 0.4mm
+# pop mean= 0.3 with stnd dev of 0.1 
+# is the sample population different from the overall pop?
+      #difference of samp and pop, over stnd err
+
+2* pnorm(abs(z), lower.tail = FALSE)
