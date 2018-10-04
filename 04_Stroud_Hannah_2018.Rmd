@@ -47,7 +47,9 @@ Two researchers testing the same null hypothesis, all equal example n1=60 and n2
 100 independent hypothesis tests with an alpha of 0.05. Use R to calc P value.
 
 29a. If all null hypothesis were true, what is the probability that the researchers would reject none of them?
+```{r}
 
+```
 29b. If all 100 null hypothesis were true, how many of those tests on average are expected to reject the null? 
 
 ### Question 2- ch 7, Q22
@@ -87,11 +89,12 @@ now that you've done that, calculate the results from z-tests. Plot p by sample 
 ```{r}
 Sim_data <- Sim_data %>% 
  mutate(sigma_ybar= SD_val/(sqrt(samp_size))) %>%  #Sigma_y bar formula from slides
-  mutate(Z_score= (sample_mean- 80)/sigma_ybar) %>%
-  mutate(p_val= pnorm(abs(Z_score), lower.tail = FALSE))
+  mutate(Z_score= (sample_mean - 80)/sigma_ybar) %>%
+  mutate(p_val= pnorm(abs(Z_score), lower.tail = FALSE))%>% 
+  ungroup()
 
 Sim_plot <- ggplot(data= Sim_data, 
-                   mapping = aes(x= samp_size, y= p_val ))+ 
+                   mapping = aes(x= samp_size, y= p_val))+ 
   geom_point() +
   facet_wrap(SD_val)
 Sim_plot
@@ -107,12 +110,33 @@ sim_power <- Sim_data %>%
   ungroup()
 
 ggplot(data= sim_power, 
-       mapping= aes(x= samp_size, y= power, group= SD_val, color= SD_val))+
+       mapping= aes(x= samp_size, y= power, group= SD_val, color= factor(SD_val)))+
          geom_point() +
           geom_line() +
     geom_hline(yintercept= 0.8, lty= 2)+
-  scale_color_gradientn(colors= rainbow(8))
-# crossing(alpha=10^(-1:10)) %>% #crossing takes all rows in source data and crosses with all rows you give in argu
-                  #crossed sim_data with every alpha (60,000 obs over 5000)       
+  scale_color_discrete(guide = guide_legend(title=expression(alpha)))
 ```
 
+#### 3.4 Many alphas
+Last, use `crossing` again to explore changing alphas from 0.01 to 0.1. Plot power curves with different alphas as different colors, and use faceting to look at different SDs.
+
+```{r}
+sim_alpha <- Sim_data %>% 
+  crossing(alpha=10^(-2:-1)) %>%
+  group_by(samp_size, SD_val, alpha) %>%
+  summarize(power= 1- sum(p_val>alpha)/n()) %>%
+  ungroup()
+
+ggplot(data=sim_alpha, mapping= 
+         aes(x= samp_size, y= power, color= factor(alpha)))+
+  geom_point()+
+  facet_wrap(~SD_val)
+
+
+```
+
+#### 3.5 What does it all mean? What do you learn about how alpha and SD affect power?  
+The higher the standard deviation, the large sample size needed to get a satisfactory power. Increasing alpha increases power, but it leads to trade off of increasing your likelihood of falsely rejecting the null hypothesis.   
+
+#### 3.6 How do you think that changing the effect size would affect power? 
+A bigger effect size would increase power, because it would be easier to detect. 
