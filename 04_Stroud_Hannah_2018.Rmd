@@ -85,7 +85,7 @@ Sim_data <- Sim_data %>%
 now that you've done that, calculate the results from z-tests. Plot p by sample size, using `facet_wrap` for different SD values  
 
 ```{r}
-Sim_data <- Sim_data %>% #overwrite 
+Sim_data <- Sim_data %>% 
  mutate(sigma_ybar= SD_val/(sqrt(samp_size))) %>%  #Sigma_y bar formula from slides
   mutate(Z_score= (sample_mean- 80)/sigma_ybar) %>%
   mutate(p_val= pnorm(abs(Z_score), lower.tail = FALSE))
@@ -97,10 +97,22 @@ Sim_plot <- ggplot(data= Sim_data,
 Sim_plot
 
 ```
-# Sample of 10 flies
-# Sample mean of antenna length= 0.4mm
-# pop mean= 0.3 with stnd dev of 0.1 
-# is the sample population different from the overall pop?
-      #difference of samp and pop, over stnd err
+#### 3.3 P and Power
+plot power for an alpha of 0.05, but use color for different SD values. Include our threshold power of 0.8.
 
-2* pnorm(abs(z), lower.tail = FALSE)
+```{r}
+sim_power <- Sim_data %>%
+  group_by(SD_val, samp_size) %>%
+  summarize(power= 1-sum(p_val>0.05)/n()) %>%
+  ungroup()
+
+ggplot(data= sim_power, 
+       mapping= aes(x= samp_size, y= power, group= SD_val, color= SD_val))+
+         geom_point() +
+          geom_line() +
+    geom_hline(yintercept= 0.8, lty= 2)+
+  scale_color_gradientn(colors= rainbow(8))
+# crossing(alpha=10^(-1:10)) %>% #crossing takes all rows in source data and crosses with all rows you give in argu
+                  #crossed sim_data with every alpha (60,000 obs over 5000)       
+```
+
