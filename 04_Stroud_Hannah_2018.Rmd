@@ -39,28 +39,39 @@ Two researchers testing the same null hypothesis, all equal example n1=60 and n2
 
 21b. The study with the higher power is the one with 100 participants since all else is equal in the study- power increases with sample size 
 
-21c. Type I errors are regulated by the choice of alpha, which is the same for both studies, so they are both as likely to commit a type I error....
+21c. Type I errors are regulated by the choice of alpha, which is the same for both studies, so they are both as likely to commit a type I error. 
 
 21d. The test should be two-tailed because the null hypothesis is that the inhibitors have no effect on cardiac arrest, which means the alternative hypothesis is that they have an effect which could either be in either direction- reducing or increasing the risk of cardiac arrest.   
 
 ####1.3 Question 29
 100 independent hypothesis tests with an alpha of 0.05. Use R to calc P value.
 
-29a. If all null hypothesis were true, what is the probability that the researchers would reject none of them?
-```{r}
+29a. The probability the researchers would reject all of them is the same as alpha- so it's 5%.  
 
-```
-29b. If all 100 null hypothesis were true, how many of those tests on average are expected to reject the null? 
+29b. 5 out of 100 are expected to be rejected if they are all true.   
 
 ### Question 2- ch 7, Q22
 
-9821 slices of toast dropped, 6101 landed butter side down
+####9821 slices of toast dropped, 6101 landed butter side down
 
 a. What is the 95% CI for the probability of a toast landing butter side down?
+```{r}
+#need SD to get CI
+#two options --> binomial distribution
+prob_butter <- 6101/9821
+prob_blank <- 1- prob_butter
+
+binom.test(6101, 9821, conf.level = 0.95)
+```
+The CI calculated by this formula is 0.612- 0.631.  
 
 b. Using the results of part a, is it plausible there is a 50-50 chance of toast landing butter size up or butter size down?  
+```{r}
+#calculate p value, like lab
+pbinom(6101, size=9821, prob= 0.5, lower.tail= FALSE)
 
-
+```
+Our p value is extremely small,so I don't think a 50-50 chance of toast landing butter size up or down is plausible. 
 ###3 From the Lab: Many SDs and Alphas
 Assume average population-wide resting heart rate of 80 bpm with a standard deviation of 6, effect size of 5  
 #### Goal: what sample size do we need to achieve a power of 0.8? 
@@ -76,7 +87,6 @@ SD_val <- c(3:10)
 Sim_data <- crossing(Sim_data
          , SD_val)
 Sim_data <- Sim_data %>% 
-  
  group_by(1:n()) %>%   #n= allows us to change the 500, and not need to change 
   #get a sample mean
   mutate(sample_mean= mean(rnorm(samp_size, 85, SD_val))) %>%
@@ -96,7 +106,7 @@ Sim_data <- Sim_data %>%
 Sim_plot <- ggplot(data= Sim_data, 
                    mapping = aes(x= samp_size, y= p_val))+ 
   geom_point() +
-  facet_wrap(SD_val)
+  facet_wrap(~SD_val)
 Sim_plot
 
 ```
@@ -122,7 +132,7 @@ Last, use `crossing` again to explore changing alphas from 0.01 to 0.1. Plot pow
 
 ```{r}
 sim_alpha <- Sim_data %>% 
-  crossing(alpha=10^(-2:-1)) %>%
+  crossing(alpha= seq(0.01, 0.1, .01)) %>%
   group_by(samp_size, SD_val, alpha) %>%
   summarize(power= 1- sum(p_val>alpha)/n()) %>%
   ungroup()
@@ -130,13 +140,14 @@ sim_alpha <- Sim_data %>%
 ggplot(data=sim_alpha, mapping= 
          aes(x= samp_size, y= power, color= factor(alpha)))+
   geom_point()+
+  geom_line() +
   facet_wrap(~SD_val)
 
 
 ```
 
 #### 3.5 What does it all mean? What do you learn about how alpha and SD affect power?  
-The higher the standard deviation, the large sample size needed to get a satisfactory power. Increasing alpha increases power, but it leads to trade off of increasing your likelihood of falsely rejecting the null hypothesis.   
+The higher the standard deviation, the larger sample size needed to get a satisfactory power. Increasing alpha increases power, but it leads to trade off of increasing your likelihood of falsely rejecting the null hypothesis.   
 
 #### 3.6 How do you think that changing the effect size would affect power? 
-A bigger effect size would increase power, because it would be easier to detect. 
+A bigger effect size would increase power to a point, but if the effect size becomes too large we increase our risk of a Type I error.   
